@@ -1,1 +1,1 @@
-Check out the live calculator [here](https://tiny-belt.github.io/Filament-Cost-Calculator/).
+Check out the **3D Print Cost Calculator** by clicking >>[here](https://tiny-belt.github.io/Filament-Cost-Calculator/index)<<.
