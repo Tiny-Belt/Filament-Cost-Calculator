@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Print Cost Calculator</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1e1e1e;
+    color: #ffffff;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #333333;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+h2 {
+    color: #ffffff;
+}
+
+.label {
+    font-size: 16px;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+.input-field {
+    width: calc(100% - 25px);
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    background-color: #444444;
+    color: #ffffff;
+}
+
+.button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+}
+
+.button:hover {
+    background-color: #45a049;
+}
+
+.part {
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 10px;
+    margin-bottom: 5px;
+    display: flex; 
+    align-items: center;
+    justify-content: space-between; 
+}
+
+.part label {
+    margin-right: 10px; 
+}
+
+.remove_button {
+    background-color: #f44336;
+    align-self: center; 
+    width: 20px;
+    height: 20px; 
+    font-size: 12px; 
+    padding: 5px;
+    margin-left: 10px; 
+    border: none; 
+    border-radius: 20%; 
+    margin-bottom: 19px;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>3D Print Cost Calculator</h2>
+
+    <div>
+        <label class="label" for="filament_cost">Filament Cost ($/g):</label>
+        <input class="input-field" type="number" id="filament_cost">
+    </div>
+
+    <div>
+        <label class="label" for="total_roll_weight">Total Roll Weight (lbs):</label>
+        <input class="input-field" type="number" id="total_roll_weight">
+    </div>
+
+    <div id="parts_container">
+        <!-- Input fields for the first part -->
+        <div class="part">
+            <label class="label" for="print_weight">Part 1</label>
+            <label class="label" for="print_weight">Print Weight (g):</label>
+            <input class="input-field" type="number" id="print_weight">
+            <button class="button remove_button" onclick="removePart(this)">-</button>
+            <p class="part_cost"></p>
+        </div>
+    </div>
+
+    <button class="button" id="add_part_btn" onclick="addPart()">Add Part</button>
+    <button class="button" onclick="calculatePrintCost()">Calculate</button>
+
+    <p class="label" id="total_cost"></p>
+</div>
+
+<script>
+function addPart() {
+    var partsContainer = document.getElementById("parts_container");
+    var numParts = partsContainer.children.length + 1; // Get the total number of parts and increment for the new part
+
+    // Create a new div for the new part
+    var newPartDiv = document.createElement("div");
+    newPartDiv.classList.add("part");
+
+    // Add input fields for the new part
+    newPartDiv.innerHTML = `
+        <label class="label" for="print_weight">Part ${numParts}</label>
+        <label class="label" for="print_weight">Print Weight (g):</label>
+        <input class="input-field" type="number" id="print_weight">
+        <button class="button remove_button" onclick="removePart(this)">-</button>
+        <p class="part_cost"></p>
+    `;
+
+    // Append the new part to the container
+    partsContainer.appendChild(newPartDiv);
+}
+
+// Function to remove the last part
+function removePart(button) {
+    var partsContainer = document.getElementById("parts_container");
+    var partToRemove = button.parentNode;
+    partsContainer.removeChild(partToRemove);
+}
+
+// Function to calculate print cost
+function calculatePrintCost() {
+  var totalCost = 0;
+  var parts = document.querySelectorAll(".part");
+
+  // Get the filament cost from the input field
+  var filamentCost = parseFloat(document.getElementById("filament_cost").value);
+
+  // Check if the filament cost is a valid number
+  if (isNaN(filamentCost) || filamentCost <= 0) {
+      alert("Please enter a valid filament cost.");
+      return;
+  }
+
+  // Get the total roll weight in pounds from the input field
+  var totalRollWeightLbs = parseFloat(document.getElementById("total_roll_weight").value);
+
+  // Check if the total roll weight is a valid number
+  if (isNaN(totalRollWeightLbs) || totalRollWeightLbs <= 0) {
+      alert("Please enter a valid total roll weight.");
+      return;
+  }
+
+  parts.forEach(function(part) {
+      var printWeight = parseFloat(part.querySelector(".input-field").value);
+      if (!isNaN(printWeight)) {
+          var totalRollWeightGrams = totalRollWeightLbs * 453.592; // Convert pounds to grams
+          var costPerGram = filamentCost / totalRollWeightGrams;
+          var costOfFilamentUsed = costPerGram * printWeight;
+          totalCost += costOfFilamentUsed;
+          part.querySelector(".part_cost").textContent = "Cost: $" + costOfFilamentUsed.toFixed(2);
+      }
+  });
+
+  // Display the total cost
+  document.getElementById("total_cost").textContent = "Total Cost: $" + totalCost.toFixed(2);
+}
+
+</script>
+
+</body>
+</html>
